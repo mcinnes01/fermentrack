@@ -11,11 +11,6 @@ import pkg_resources
 import sentry_sdk
 from packaging import version
 
-# Let's get sentry support going. Breaking this out into its own Sentry queue for now
-sentry_sdk.init(
-    "http://7a7942e5dd7b4eacbc2d1eb48a2c8e30@sentry.optictheory.com:9000/8",
-    #traces_sample_rate=1.0
-)
 
 LOG = logging.getLogger("tilt")  # Initialize logging
 LOG.setLevel(logging.INFO)
@@ -39,6 +34,12 @@ application = get_wsgi_application()
 from gravity.tilt.TiltHydrometer import TiltHydrometer
 
 # import django.core.exceptions
+
+# Let's get sentry support going. Breaking this out into its own Sentry queue for now
+sentry_sdk.init(
+    "http://7a7942e5dd7b4eacbc2d1eb48a2c8e30@sentry.optictheory.com:9000/8",
+    #traces_sample_rate=1.0
+)
 
 tilt_monitor_utils.process_monitor_options()
 
