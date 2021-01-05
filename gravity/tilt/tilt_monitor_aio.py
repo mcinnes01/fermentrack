@@ -22,12 +22,12 @@ LOG.setLevel(logging.INFO)
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"  # TODO - Figure out the best way to convert this to use sync_to_async calls
 
-# for package in pkg_resources.working_set:  # We're having environment issues - Check the environment before continuing
-#     if package.project_name == 'aioblescan':
-#         # This is ridiculous but package.parsed_version doesn't return the right type of Version.
-#         if version.parse(package.parsed_version.public) < version.parse("0.2.6"):
-#             LOG.error("Incorrect aioblescan version installed - unable to run")
-#             exit(1)
+for package in pkg_resources.working_set:  # We're having environment issues - Check the environment before continuing
+    if package.project_name == 'aioblescan':
+        # This is ridiculous but package.parsed_version doesn't return the right type of Version.
+        if version.parse(package.parsed_version.public) < version.parse("0.2.6"):
+            LOG.error("Incorrect aioblescan version installed - unable to run")
+            exit(1)
 
 # done before importing django app as it does setup
 # TODO - Come back and refactor this to start working properly
