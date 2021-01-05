@@ -1,31 +1,28 @@
 #!/usr/bin/python
 
-# TODO - Figure out the best way to convert this to use sync_to_async calls
-import os, sys
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-
-# Let's get sentry support going
-from sentry_sdk import init, capture_exception
-# This is the sentry queue for Fermentrack
-#init('http://3a1cc1f229ae4b0f88a4c6f7b5d8f394:c10eae5fd67a43a58957887a6b2484b1@sentry.optictheory.com:9000/2')
-# Breaking this out into its own Sentry queue for now
-init('http://12b1f08408de4586a18db78e7dbe27e4:323dad0efed24058b06cacd13a990987@sentry.optictheory.com:9000/10')
-
-import time, datetime, getopt, pid
-from typing import List, Dict
 import asyncio
-
-# Initialize logging
+import datetime
 import logging
-LOG = logging.getLogger("tilt")
-LOG.setLevel(logging.INFO)
+import os
+from typing import Dict
 
-# We're having environment issues - Check the environment before continuing
 import aioblescan as aiobs
 import pkg_resources
+import sentry_sdk
 from packaging import version
 
-for package in pkg_resources.working_set:
+# Let's get sentry support going. Breaking this out into its own Sentry queue for now
+sentry_sdk.init(
+    "http://7a7942e5dd7b4eacbc2d1eb48a2c8e30@sentry.optictheory.com:9000/8",
+    #traces_sample_rate=1.0
+)
+
+LOG = logging.getLogger("tilt")  # Initialize logging
+LOG.setLevel(logging.INFO)
+
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"  # TODO - Figure out the best way to convert this to use sync_to_async calls
+
+for package in pkg_resources.working_set:  # We're having environment issues - Check the environment before continuing
     if package.project_name == 'aioblescan':
         # This is ridiculous but package.parsed_version doesn't return the right type of Version.
         if version.parse(package.parsed_version.public) < version.parse("0.2.6"):
@@ -33,13 +30,13 @@ for package in pkg_resources.working_set:
             exit(1)
 
 # done before importing django app as it does setup
+# TODO - Come back and refactor this to start working properly
 from . import tilt_monitor_utils
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
 from gravity.tilt.TiltHydrometer import TiltHydrometer
-import gravity.models
 
 # import django.core.exceptions
 
@@ -111,7 +108,7 @@ def processBLEBeacon(data):
 
     except Exception as e:
         LOG.error(e)
-        capture_exception(e)
+        sentry_sdk.capture_exception(e)
         exit(1)
         return False  # This can't be called, but it's here to make Pycharm happy
 
