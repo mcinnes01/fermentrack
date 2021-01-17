@@ -128,7 +128,9 @@ WSGI_APPLICATION = 'fermentrack_django.wsgi.application'
 # moved to Postgres, and ones that act as a single image where we still use sqlite. For the single
 # image versions we move the database to a subdirectory which can then be persisted.
 if USE_DOCKER:
-    DB_DIR = ROOT_DIR / "db"
+    DB_DIR = env("MOUNT_DB_DIR")
+    if not DB_DIR:
+        DB_DIR = ROOT_DIR / "db"
 else:
     DB_DIR = ROOT_DIR
 
@@ -184,7 +186,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = ROOT_DIR / 'media'
 
 DATA_URL = '/data/'
-DATA_ROOT = ROOT_DIR / 'data'
+DATA_ROOT = env("MOUNT_DATA_DIR")
+if not USE_DOCKER or not DATA_ROOT:
+    DATA_ROOT = ROOT_DIR / 'data'
 
 
 # Constance configuration
