@@ -88,7 +88,9 @@ def get_local_version_numbers() -> dict:
     versions = {'docker_container_version': env.int("DOCKER_CONTAINER_VERSION", default=1),
                 'env_django_version': env.int("ENV_DJANGO_VERSION", default=-1),
                 'env_postgres_version': env.int("ENV_POSTGRES_VERSION", default=-1),
-                'use_docker': env.bool("USE_DOCKER", default=False), }
+                'use_docker': env.bool("USE_DOCKER", default=False),
+                'mount_data_dir': env("MOUNT_DATA_DIR"),
+                'mount_db_dir': env("MOUNT_DB_DIR"), }
     return versions
 
 # The following was used for testing during development
